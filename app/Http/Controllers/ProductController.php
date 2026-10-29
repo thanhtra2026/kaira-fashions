@@ -27,36 +27,51 @@ class ProductController extends Controller
         ]);
 
         $categories = Category::all();
-        $category   = $slug ? Category::where('slug', $slug)->firstOrFail() : null;
+        $category = $slug
+            ? Category::where('slug', $slug)->firstOrFail()
+            : null;
 
         $keyword = trim((string) $request->input('q', ''));
-        $min     = $request->filled('min_price') ? (int) $request->input('min_price') : null;
-        $max     = $request->filled('max_price') ? (int) $request->input('max_price') : null;
-        $sort    = $request->input('sort', 'newest');
+        $min = $request->filled('min_price')
+            ? (int) $request->input('min_price')
+            : null;
+        $max = $request->filled('max_price')
+            ? (int) $request->input('max_price')
+            : null;
+        $sort = $request->input('sort', 'newest');
 
-        // Nếu nhập ngược (từ lớn hơn đến) thì tự đổi chỗ
+        // Nếu nhập giá từ lớn hơn giá đến thì tự đổi chỗ.
         if ($min !== null && $max !== null && $min > $max) {
             [$min, $max] = [$max, $min];
         }
 
         $query = Product::with('category')
-            ->when($category, fn ($q) => $q->where('category_id', $category->id))
-            ->when($keyword !== '', function ($q) use ($keyword) {
-                $q->where(function ($w) use ($keyword) {
-                    $w->where('name', 'like', "%{$keyword}%")
-                      ->orWhere('description', 'like', "%{$keyword}%");
-                });
-            })
-            ->when($min !== null, fn ($q) => $q->where('price', '>=', $min))
-            ->when($max !== null, fn ($q) => $q->where('price', '<=', $max));
+            ->when(
+                $category,
+                fn ($q) => $q->where('category_id', $category->id)
+            )
+            // Tìm từ khóa trong tên sản phẩm.
+            ->when(
+                $keyword !== '',
+                fn ($q) => $q->where('name', 'like', "%{$keyword}%")
+            )
+            ->when(
+                $min !== null,
+                fn ($q) => $q->where('price', '>=', $min)
+            )
+            ->when(
+                $max !== null,
+                fn ($q) => $q->where('price', '<=', $max)
+            );
 
+        // Sắp xếp trên tập sản phẩm đã áp dụng các điều kiện lọc.
         match ($sort) {
             'price_asc'  => $query->orderBy('price', 'asc'),
             'price_desc' => $query->orderBy('price', 'desc'),
             default      => $query->latest(),
         };
 
-        // withQueryString(): giữ lại bộ lọc khi chuyển trang
+        // Giữ lại bộ lọc khi chuyển trang.
         $products = $query->paginate(6)->withQueryString();
 
         return view('products.index', [
@@ -73,7 +88,9 @@ class ProductController extends Controller
     // /san-pham/{slug}
     public function show(string $slug)
     {
-        $product = Product::with('category')->where('slug', $slug)->firstOrFail();
+        $product = Product::with('category')
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         $related = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
