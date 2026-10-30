@@ -114,3 +114,33 @@
   display: block; width: 100%; height: auto;
   aspect-ratio: 3 / 4; object-fit: cover;
 }
+ 
+/* ---- Giao diện điện thoại / tablet ---- */
+/* Tên sản phẩm: Bootstrap .fs-5 có !important nên phải ghi đè bằng !important mới thu nhỏ được */
+.product-item .product-content h5.fs-5 { font-size: 1.05rem !important; }
+ 
+@media (max-width: 767.98px) {
+  /* Chữ trong banner không còn dính sát mép màn hình */
+  .banner-content { padding-left: 1rem; padding-right: 1rem; }
+  /* Bớt khoảng trắng thừa dưới banner */
+  #billboard { padding-bottom: 2rem !important; }
+  /* Tên sản phẩm gọn hơn để không xuống 3 dòng */
+  .product-item .product-content h5.fs-5 { font-size: .92rem !important; letter-spacing: .02em; }
+  .product-item .product-content > span { font-size: .95rem; }
+}
+ 
+/* ---- Khối "Bộ sưu tập thu đông": thu nhỏ tiêu đề và bớt khoảng đệm trên điện thoại ---- */
+@media (max-width: 767.98px) {
+  .collection .collection-content { padding: 1.5rem !important; margin: 0 !important; }
+  .collection .collection-content .element-title { font-size: 1.6rem; line-height: 1.25; }
+}
+ 
+/* ---- "Bộ sưu tập": ảnh bên trái cao bằng khung chữ bên phải (không còn khoảng xám dưới ảnh) ---- */
+@media (min-width: 768px) {
+  .collection .collection-item .column-container:not(.bg-white) { display: flex; }
+  .collection .collection-item .column-container:not(.bg-white) .image-holder { flex: 1; width: 100%; }
+  .collection .collection-item .column-container:not(.bg-white) .image-holder img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+}
+ 
