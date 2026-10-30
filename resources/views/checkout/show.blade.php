@@ -32,6 +32,7 @@
                    class="form-control @error('shipping_phone') is-invalid @enderror" required>
           </div>
           <div class="mb-3">
+            @include('checkout._address-picker')
             <label for="shipping_address" class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
             <textarea id="shipping_address" name="shipping_address" rows="3" maxlength="255"
                       class="form-control @error('shipping_address') is-invalid @enderror" required>{{ old('shipping_address') }}</textarea>
@@ -63,3 +64,7 @@
   </div>
 </section>
 @endsection
+
+@push('scripts')
+  <script src="{{ asset('js/address-picker.js') }}" defer></script>
+@endpush

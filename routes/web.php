@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AddressLookupController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
@@ -26,6 +27,11 @@ Route::delete('/gio-hang/{product}', [CartController::class, 'remove'])->name('c
 
 // ---- Thanh toán + đơn hàng của tôi (cần đăng nhập) ----
 Route::middleware('auth')->group(function () {
+    // Chỉ tải dữ liệu địa phương; không gửi thông tin người nhận ra dịch vụ ngoài.
+    Route::get('/dia-chi/tinh-thanh', [AddressLookupController::class, 'provinces'])
+        ->middleware('throttle:60,1')->name('address.provinces');
+    Route::get('/dia-chi/tinh-thanh/{province}/phuong-xa', [AddressLookupController::class, 'wards'])
+        ->where('province', '[1-9][0-9]?')->middleware('throttle:60,1')->name('address.wards');
     Route::get('/thanh-toan', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::post('/thanh-toan', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/don-hang', [OrderController::class, 'index'])->name('orders.index');
