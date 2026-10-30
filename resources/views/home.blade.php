@@ -189,7 +189,7 @@
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
                 <a href="{{ route('categories.show', 'nam') }}">
-                  <img src="{{ asset('kaira/images/cat-item1.jpg') }}" alt="categories" class="product-image img-fluid">
+                  <img src="{{ asset('kaira/images/cat-item1.jpg') }}" alt="Thời trang nam" class="product-image img-fluid">
                 </a>
               </div>
               <div class="category-content">
@@ -203,7 +203,7 @@
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
                 <a href="{{ route('categories.show', 'nu') }}">
-                  <img src="{{ asset('kaira/images/cat-item2.jpg') }}" alt="categories" class="product-image img-fluid">
+                  <img src="{{ asset('kaira/images/cat-item2.jpg') }}" alt="Thời trang nữ" class="product-image img-fluid">
                 </a>
               </div>
               <div class="category-content">
@@ -217,7 +217,7 @@
             <div class="cat-item image-zoom-effect">
               <div class="image-holder">
                 <a href="{{ route('categories.show', 'tre-em') }}">
-                  <img src="{{ asset('kaira/images/cat-item3.jpg') }}" alt="categories" class="product-image img-fluid">
+                  <img src="{{ asset('images/products/vay-xoe-be-gai.jpg') }}" alt="Thời trang trẻ em" class="product-image img-fluid">
                 </a>
               </div>
               <div class="category-content">

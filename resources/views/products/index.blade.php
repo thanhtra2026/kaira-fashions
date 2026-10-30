@@ -1,12 +1,12 @@
 @extends('layouts.app')
-
+ 
 @section('title', ($category->name ?? 'Tất cả sản phẩm') . ' - Kaira Fashion')
-
+ 
 @section('content')
 <section class="py-5">
   <div class="container">
     <h1 class="section-title text-center mt-4">{{ $category ? 'Thời trang ' . mb_strtolower($category->name) : 'Tất cả sản phẩm' }}</h1>
-
+ 
     {{-- Lọc theo danh mục --}}
     <div class="d-flex flex-wrap justify-content-center gap-2 my-4">
       <a href="{{ route('products.index') }}" class="btn {{ $category ? 'btn-outline-dark' : 'btn-dark' }} text-uppercase">Tất cả</a>
@@ -15,13 +15,13 @@
            class="btn {{ $category && $category->id === $cat->id ? 'btn-dark' : 'btn-outline-dark' }} text-uppercase">{{ $cat->name }}</a>
       @endforeach
     </div>
-
+ 
     {{-- Tìm kiếm + lọc khoảng giá + sắp xếp --}}
     @php
       $formAction = $category ? route('categories.show', $category->slug) : route('products.index');
       $hasFilter  = $keyword !== '' || $min !== null || $max !== null || $sort !== 'newest';
     @endphp
-
+ 
     @if ($errors->any())
       <div class="alert alert-danger">
         @foreach ($errors->all() as $error)
@@ -29,7 +29,7 @@
         @endforeach
       </div>
     @endif
-
+ 
     <form action="{{ $formAction }}" method="get" class="row g-2 align-items-end mb-4">
       <div class="col-md-4">
         <label for="q" class="form-label">Từ khóa</label>
@@ -58,12 +58,12 @@
         @endif
       </div>
     </form>
-
+ 
     <p class="text-muted">Tìm thấy {{ $products->total() }} sản phẩm</p>
-
+ 
     <div class="row">
       @forelse ($products as $product)
-        <div class="col-md-4 mb-5">
+        <div class="col-12 col-sm-6 col-lg-4 mb-5">
           <div class="product-item image-zoom-effect link-effect">
             <div class="image-holder">
               <a href="{{ route('products.show', $product->slug) }}">
@@ -85,7 +85,7 @@
         <p class="text-center">Không tìm thấy sản phẩm phù hợp.</p>
       @endforelse
     </div>
-
+ 
     <div class="d-flex justify-content-center">{{ $products->links() }}</div>
   </div>
 </section>

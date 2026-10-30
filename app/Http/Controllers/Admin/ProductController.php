@@ -1,19 +1,19 @@
 <?php
-
+ 
 namespace App\Http\Controllers\Admin;
-
+ 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
+ 
 class ProductController extends Controller
 {
     // Thư mục chứa ảnh do Admin upload (nằm trong public/ nên asset() hiển thị được ngay)
     private const UPLOAD_DIR = 'images/products/uploads';
-
+ 
     // Danh sách + tìm kiếm (tên) + lọc danh mục + phân trang
     public function index(Request $request)
     {
@@ -21,17 +21,17 @@ class ProductController extends Controller
             'q'           => ['nullable', 'string', 'max:100'],
             'category_id' => ['nullable', 'integer'],
         ]);
-
+ 
         $keyword    = trim((string) $request->input('q', ''));
         $categoryId = $request->filled('category_id') ? (int) $request->input('category_id') : null;
-
+ 
         $products = Product::with('category')
             ->when($keyword !== '', fn ($q) => $q->where('name', 'like', "%{$keyword}%"))
             ->when($categoryId, fn ($q) => $q->where('category_id', $categoryId))
             ->latest('id')
-            ->paginate(10)
+            ->paginate(6)
             ->withQueryString();
-
+ 
         return view('admin.products.index', [
             'products'   => $products,
             'categories' => Category::orderBy('name')->get(),
@@ -39,7 +39,7 @@ class ProductController extends Controller
             'categoryId' => $categoryId,
         ]);
     }
-
+ 
     public function create()
     {
         return view('admin.products.create', [
@@ -47,21 +47,21 @@ class ProductController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
-
+ 
     public function store(Request $request)
     {
         $data = $request->validate($this->rules(), $this->messages());
-
+ 
         $data['slug'] = $this->uniqueSlug($data['name']);
         $data['image'] = $request->hasFile('image') ? $this->saveImage($request->file('image')) : null;
         unset($data['remove_image']);
-
+ 
         Product::create($data);
-
+ 
         return redirect()->route('admin.products.index')
             ->with('success', 'Đã thêm sản phẩm mới.');
     }
-
+ 
     public function edit(Product $product)
     {
         return view('admin.products.edit', [
@@ -69,16 +69,16 @@ class ProductController extends Controller
             'categories' => Category::orderBy('name')->get(),
         ]);
     }
-
+ 
     public function update(Request $request, Product $product)
     {
         $data = $request->validate($this->rules(), $this->messages());
-
+ 
         // Chỉ đổi slug khi đổi tên
         if ($product->name !== $data['name']) {
             $data['slug'] = $this->uniqueSlug($data['name'], $product->id);
         }
-
+ 
         if ($request->hasFile('image')) {
             $this->deleteImage($product->image);
             $data['image'] = $this->saveImage($request->file('image'));
@@ -87,13 +87,13 @@ class ProductController extends Controller
             $data['image'] = null;
         }
         unset($data['remove_image']);
-
+ 
         $product->update($data);
-
+ 
         return redirect()->route('admin.products.index')
             ->with('success', 'Đã cập nhật sản phẩm.');
     }
-
+ 
     public function destroy(Product $product)
     {
         // Không xóa sản phẩm đã nằm trong đơn hàng để giữ lịch sử đơn
@@ -101,14 +101,14 @@ class ProductController extends Controller
             return redirect()->route('admin.products.index')
                 ->with('error', "Không thể xóa \"{$product->name}\" vì đã có trong đơn hàng.");
         }
-
+ 
         $this->deleteImage($product->image);
         $product->delete();
-
+ 
         return redirect()->route('admin.products.index')
             ->with('success', 'Đã xóa sản phẩm.');
     }
-
+ 
     private function rules(): array
     {
         return [
@@ -121,7 +121,7 @@ class ProductController extends Controller
             'remove_image' => ['nullable', 'boolean'],
         ];
     }
-
+ 
     private function messages(): array
     {
         return [
@@ -144,31 +144,31 @@ class ProductController extends Controller
             'image.uploaded'       => 'Tải ảnh thất bại (có thể ảnh vượt quá giới hạn của máy chủ, hãy thử ảnh dưới 2 MB).',
         ];
     }
-
+ 
     private function uniqueSlug(string $name, ?int $ignoreId = null): string
     {
         $base = Str::slug($name) ?: 'san-pham';
         $slug = $base;
         $i = 2;
-
+ 
         while (Product::where('slug', $slug)
             ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->exists()) {
             $slug = $base . '-' . $i++;
         }
-
+ 
         return $slug;
     }
-
+ 
     // Lưu ảnh vào public/images/products/uploads, trả về đường dẫn tương đối để asset() dùng
     private function saveImage($file): string
     {
         $filename = time() . '-' . Str::random(8) . '.' . $file->extension();
         $file->move(public_path(self::UPLOAD_DIR), $filename);
-
+ 
         return self::UPLOAD_DIR . '/' . $filename;
     }
-
+ 
     // Chỉ xóa ảnh do Admin upload; ảnh mẫu của seeder (images/products/xxx.jpg) được giữ lại
     private function deleteImage(?string $path): void
     {
@@ -180,3 +180,4 @@ class ProductController extends Controller
         }
     }
 }
+ 
